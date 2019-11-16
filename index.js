@@ -36,6 +36,11 @@ function promptUser() {
       type: "input",
       name: "linkedin",
       message: "Enter your LinkedIn URL."
+    },
+    {
+      type: "input",
+      name: "color",
+      message: "What is your favorite color?"
     }
   ]);
 }
@@ -52,7 +57,7 @@ function generateHTML(answers) {
 </head>
 <body>
   <div class="jumbotron jumbotron-fluid">
-  <div class="container">
+  <div class="container" style="background-color:${answers.color}">
     <h1 class="display-4">Hi! My name is ${answers.name}</h1>
     <p class="lead">I am from ${answers.location}.</p>
     <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
