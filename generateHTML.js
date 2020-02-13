@@ -1,4 +1,34 @@
+const colors = {
+    green: {
+        headerBackground: "#6B8E23",
+        headerColor: "black",
+        photoBorderColor: "white",
+        links: "blue"
+    },
+    blue: {
+        headerBackground: "#6A5ACD",
+        headerColor: "white",
+        photoBorderColor: "white",
+        links: "white"  
+    },
+    black: {
+        headerBackground: "#808080",
+        headerColor: "black",
+        photoBorderColor: "black",
+        links: "darkgray"
+    },
+    red: {
+        headerBackground: "#CD5C5C",
+        headerColor: "black",
+        photoBorderColor: "white",
+        links: "darkgray"
+    }
+};
 
+
+function generateHTML(data) {
+    console.log(data)
+    return `
     <!DOCTYPE html>
     <html lang="en">
     
@@ -14,9 +44,9 @@
                 margin-left: 20px;
                 margin-top: 15px;
                 position: relative;
-                background-color: #808080;
+                background-color: ${colors[data.color].headerBackground};
                 margin: auto;
-                color: black;
+                color: ${colors[data.color].headerColor};
                 border:1px solid black;
                 }
     
@@ -54,7 +84,7 @@
                     list-style-type: none;s
                 }
                 a{
-                    color: black;
+                    color: ${colors[data.color].photoBorderColor};
                 }
                 .col-4{
                     text-align: center;
@@ -87,7 +117,7 @@
         </style>
     
     
-        <title>null's Github Profile</title>
+        <title>${data.response.name}'s Github Profile</title>
     </head>
     
 <body>
@@ -97,12 +127,12 @@
     <div id="topCard">
         <div class = "row"> 
             <div class = "col-4">
-                <img id="frontpageimage" src="https://avatars2.githubusercontent.com/u/54558676?v=4"/>
+                <img id="frontpageimage" src="${data.response.avatar_url}"/>
             </div>
             <div class = "col-8">
                 <ul>
-                    <li><h2>My name is null</h2></li>
-                    <li><h2>I work at null</h2></hi>
+                    <li><h2>My name is ${data.response.name}</h2></li>
+                    <li><h2>I work at ${data.response.company}</h2></hi>
                 </ul>
             </div>
         </div>
@@ -111,14 +141,15 @@
         <div class = "row">
         
             <div class = "col-4">  
-                <a class="github" style="text-align:center" href="https://github.com/schevet">My Account</a>
+                <a class="github" style="text-align:center" href="${data.response.html_url}">My Account</a>
             </div>
             <div class = "col-4">    
                 <nav>
-                 </nav>
+                ${data.response.location ? `<a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/place/
+                ${data.response.location}"><i class="fas fa-location-arrow"></i> ${data.response.location}</a>` : " "}</nav>
             </div>
             <div class = "col-4">  
-                <a class="posts" style="text-align:center" href="">My Posts</a>
+                <a class="posts" style="text-align:center" href="${data.response.blog}">My Posts</a>
             </div>
         </div>
     </div>
@@ -128,7 +159,7 @@
     <div id="bio">
         <div class = "row"> 
             <div class = "col-12">
-                <h3>  </h3>
+                <h3>${data.response.bio ? `${data.response.bio}` : " "} </h3>
             </div>
         </div>
     </div>
@@ -139,7 +170,7 @@
                 <div class = "col-6">
                     <div class = "row"> 
                         <div class = "col-12">
-                            <h4>Public Repositories 13</h4>
+                            <h4>Public Repositories ${data.response.public_repos}</h4>
                         </div>
                     </div>
                 </div>
@@ -147,7 +178,7 @@
                 <div class = "col-6">
                     <div class = "row"> 
                         <div class = "col-12">
-                            <h4>Stars None</h4>
+                            <h4>Stars ${data.response.stars ? `${data.response.stars}` : "None"}</h4>
                         </div>
                     </div>
                 </div>
@@ -157,7 +188,7 @@
                     <div class = "col-6">
                         <div class = "row"> 
                             <div class = "col-12">
-                                <h4>Followers 2</h4>
+                                <h4>Followers ${data.response.followers}</h4>
                             </div>
                         </div>
                     </div>
@@ -165,7 +196,7 @@
                 <div class = "col-6">
                     <div class = "row"> 
                         <div class = "col-12">
-                            <h4>Following 5</h4>
+                            <h4>Following ${data.response.following}</h4>
                         </div>
                     </div>
                 </div>
@@ -176,4 +207,7 @@
     
     </body>
     
-    </html>
+    </html>`;
+}
+
+module.exports = generateHTML;

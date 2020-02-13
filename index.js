@@ -1,97 +1,70 @@
-const inquirer = require("inquirer");
 const fs = require("fs");
+const path = require("path");
+const inquirer = require("inquirer");
+const open = require("open");
 const util = require("util");
 const pdf = require('html-pdf');
+const api = require("./api");
+const generateHTML = require("./generateHTML");
 
-const writeFileAsync = util.promisify(fs.writeFile);
 
-function promptUser() {
-  return inquirer.prompt([
+const prompt = [
+
     {
-      type: "input",
-      name: "name",
-      message: "What is your name?"
+        type: "list",
+        name: "color",
+        message: "What is your favorite color?",
+        choices: ["red","blue","green","black"]
     },
     {
-      type: "input",
-      name: "location",
-      message: "Where are you from?"
+        type: "input",
+        name: "github",
+        message: "Enter your GitHub Username."
     },
-    {
-      type: "input",
-      name: "hobby",
-      message: "What is your favorite hobby?"
-    },
-    {
-      type: "input",
-      name: "food",
-      message: "What is your favorite food?"
-    },
-    {
-      type: "input",
-      name: "github",
-      message: "Enter your GitHub Username"
-    },
-    {
-      type: "input",
-      name: "linkedin",
-      message: "Enter your LinkedIn URL."
-    },
-    {
-      type: "input",
-      name: "color",
-      message: "What is your favorite color?"
-    }
-  ]);
+
+];
+
+const writeFile = util.promisify(fs.writeFile);
+
+function writetoFile(data, fileName) {
+    return fs.writeFileSync(path.join(process.cwd(), fileName), data)
 }
 
-function generateHTML(answers) {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-  <title>Document</title>
-</head>
-<body>
-  <div class="jumbotron jumbotron-fluid">
-  <div class="container" style="background-color:${answers.color}">
-    <h1 class="display-4">Hi! My name is ${answers.name}</h1>
-    <p class="lead">I am from ${answers.location}.</p>
-    <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
-    <ul class="list-group">
-      <li class="list-group-item">My GitHub username is ${answers.github}</li>
-      <li class="list-group-item">LinkedIn: ${answers.linkedin}</li>
-    </ul>
-  </div>
-</div>
-</body>
-</html>`;
+function init() {
+    inquirer.prompt(prompt)
+        .then(({ github, color }) => {
+            console.log("searching");
+            api.getUser(github)
+                .then(response =>
+                    api.getStars(github)
+                        .then(stars => {
+                            console.log(github)
+                            console.log(response)
+                            return generateHTML({
+                                stars, color, response
+                            })
+                        }
+                        ))
+                .then(async function (html) {
+
+                    await writeFile("index.html", html);
+
+                    var readHtml = fs.readFileSync('index.html', 'utf8');
+                    var options = { 
+                        format: 'Letter',
+                        width: '1000px',
+                        height: '900px'
+                        };
+                     
+                    pdf.create(readHtml, options).toFile('gitprofile.pdf', function(err, res) {
+                      if (err) return console.log(err);
+                      console.log(res); 
+                    });
+            
+                })
+                .catch(function(error){
+                    console.log(error)
+                })
+        })
 }
-
-async function init() {
-  console.log("hi");
-  try {
-    const answers = await promptUser();
-
-    const html = generateHTML(answers);
-
-    await writeFileAsync("index.html", html);
-
-    var readHtml = fs.readFileSync('index.html', 'utf8');
-    var options = { format: 'Letter' };
-     
-    pdf.create(readHtml, options).toFile('test.pdf', function(err, res) {
-      if (err) return console.log(err);
-      console.log(res); 
-    });
-
-    console.log("Successfully wrote to index.html");
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 init();
