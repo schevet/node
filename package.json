@@ -507,7 +507,7 @@
       "resolved": "https://registry.npmjs.org/hasha/-/hasha-2.2.0.tgz",
       "version": "2.2.0"
     },
-    "html-pdf": "^2.2.0",
+    "html-pdf": "^3.0.1",
     "http-signature": {
       "integrity": "sha1-muzZJRFHcvPZW2WmCruPfBj7rOE=",
       "requires": {
